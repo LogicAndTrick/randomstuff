@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Vue Blade</title>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.2/vue.js"></script>
+        <script type="text/javascript" src="vue-blade.js"></script>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+            }
+
+            #app {
+                display: flex;
+                flex-flow: column nowrap;
+                height: 100%;
+            }
+
+            .blade-container {
+                flex: 1 1 auto;
+
+                display: flex;
+                flex-flow: row nowrap;
+                overflow-x: auto;
+
+                scroll-behavior: smooth;
+            }
+
+            .blade-container .blade {
+                flex: 0 0 auto;
+                
+                display: flex;
+
+                padding: 0.3em;
+                box-sizing: border-box;
+            }
+
+            .blade-container .blade-content {
+                border: 1px solid;
+                flex: 1 1 auto;
+            }
+
+            .fade-enter-active, .fade-leave-active {
+                transition: opacity .5s
+            }
+            .fade-enter, .fade-leave-to {
+                opacity: 0
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <blade-container ref="blade"></blade-container>
+            <button @click="addBlade()">Add Blade</button>
+        </div>
+        <script type="text/javascript">
+
+            var component = Vue.extend({
+                template: '<p>This is component #{{id}} '
+                        + '<a @click.prevent="close" href="#">Remove</a> '
+                        + '<a @click.prevent="maximise" href="#">Maximise</a>'
+                        + '</p>',
+                props: ['id'],
+                data: function() {
+                    return {
+                        width: Math.floor(Math.random() * 100) + '%',
+                        maximised: false
+                    };
+                },
+                methods: {
+                    close: function() {
+                        this.$emit('blade-close');
+                    },
+                    maximise: function() {
+                        this.maximised = !this.maximised;
+                        this.$emit('blade-scroll');
+                    }
+                },
+                computed: {
+                    bladeWidth: function() {
+                        return this.maximised ? '100%' : this.width;
+                    }
+                }
+            });
+            
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    blades: [],
+                    num: 1
+                },
+                methods: {
+                    addBlade: function() {
+                        this.$refs.blade.add(component, {
+                            id: this.num++
+                        });
+                    }
+                }
+            });
+
+        </script>
+    </body>
+</html>
